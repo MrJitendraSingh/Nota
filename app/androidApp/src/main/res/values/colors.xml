@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primary_deep_navy">#0D1B2A</color>
+    <color name="secondary_dark_navy">#1A2638</color>
+    <color name="primary_accent_gold">#F2E6CE</color>
+    <color name="accent_muted_gold">#D4AF37</color>
+    <color name="flute_silver">#E5E7EB</color>
+    <color name="primary_light_surface">#F5F7FA</color>
+    <color name="text_on_dark">#F5F7FA</color>
+    <color name="secondary_text">#AEB8C4</color>
+</resources>
