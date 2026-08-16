@@ -1,0 +1,26 @@
+import kotlin.Int;
+import kotlin.String;
+import kotlin.collections.List;
+
+CREATE TABLE NoteEntity (
+    id TEXT PRIMARY KEY,
+    version INTEGER AS Int NOT NULL,
+    title TEXT NOT NULL,
+    thumbnailUrl TEXT NOT NULL,
+    tempo INTEGER AS Int NOT NULL,
+    breathTime INTEGER AS Int NOT NULL,
+    scale TEXT NOT NULL,
+    instrument TEXT NOT NULL,
+    measures TEXT AS List<List<String>> NOT NULL,
+    createdAt INTEGER NOT NULL
+);
+
+selectAllNotes:
+SELECT * FROM NoteEntity;
+
+insertNote:
+INSERT INTO NoteEntity(id, version, title, thumbnailUrl, tempo, breathTime, scale, instrument, measures, createdAt)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+deleteNote:
+DELETE FROM NoteEntity WHERE id = ?;

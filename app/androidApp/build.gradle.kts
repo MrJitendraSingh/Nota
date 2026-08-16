@@ -12,6 +12,9 @@ kotlin {
 }
 dependencies {
     implementation(project(":app:shared"))
+    implementation(project(":core"))
+    implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.ktor.client.okhttp)
 
     implementation(libs.androidx.activity.compose)
 

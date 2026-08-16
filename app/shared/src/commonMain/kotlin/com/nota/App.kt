@@ -1,116 +1,50 @@
 package com.nota
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Box
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.Alignment
+
 import com.nota.theme.NotaTheme
-import androidx.compose.foundation.BorderStroke
+import com.nota.ui.home.HomeScreen
+import com.nota.ui.home.viewmodel.HomeViewModel
+import com.nota.ui.landing.LandingScreen
+import com.nota.di.CoreModule
+import com.nota.di.LocalCoreModule
+import com.nota.db.DriverFactory
+
 
 @Composable
-@Preview
-fun App() {
+fun App(driverFactory: DriverFactory) {
+    val coreModule = remember { 
+        println("App: Creating CoreModule...")
+        CoreModule(driverFactory)
+    }
+    
+    val homeViewModel = remember(coreModule) {
+        HomeViewModel(coreModule.getNotesUseCase)
+    }
+    
+    LaunchedEffect(coreModule) {
+        coreModule.dataSyncService.syncData()
+    }
+
     NotaTheme {
+        var currentScreen by remember { mutableStateOf("landing") }
+
         Surface(
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
-            Column(
-                modifier = Modifier
-                    .safeContentPadding()
-                    .fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Spacer(modifier = Modifier.height(64.dp))
-                
-                Text(
-                    text = "NOTA",
-                    fontSize = 40.sp,
-                    fontWeight = FontWeight.Light,
-                    color = MaterialTheme.colorScheme.primary,
-                    letterSpacing = 8.sp
-                )
-                
-                Text(
-                    text = "FLUTE NOTATION",
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    letterSpacing = 2.sp
-                )
-                
-                Spacer(modifier = Modifier.height(48.dp))
-                
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth(0.9f)
-                        .height(240.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surface
-                    ),
-                    shape = RoundedCornerShape(24.dp),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
-                ) {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        // Placeholder for Music Notation / Flute Staff
-                        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                            repeat(5) {
-                                HorizontalDivider(
-                                    modifier = Modifier.fillMaxWidth(0.85f),
-                                    thickness = 1.dp,
-                                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f)
-                                )
-                            }
-                        }
-                        
-                        // Example note highlight
-                        Box(
-                            modifier = Modifier
-                                .size(12.dp)
-                                .offset(x = (-20).dp, y = 6.dp)
-                                .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(50))
-                        )
-                    }
+            CompositionLocalProvider(LocalCoreModule provides coreModule) {
+                when (currentScreen) {
+                    "landing" -> LandingScreen(onStartClick = { currentScreen = "home" })
+                    "home" -> HomeScreen(homeViewModel)
                 }
-                
-                Spacer(modifier = Modifier.weight(1f))
-                
-                Button(
-                    onClick = { },
-                    modifier = Modifier.fillMaxWidth(0.8f).height(56.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
-                    )
-                ) {
-                    Text("START COMPOSING", fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
-                }
-                
-                Spacer(modifier = Modifier.height(16.dp))
-                
-                OutlinedButton(
-                    onClick = { },
-                    modifier = Modifier.fillMaxWidth(0.8f).height(56.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
-                ) {
-                    Text(
-                        "MY REPERTOIRE", 
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 1.sp
-                    )
-                }
-                
-                Spacer(modifier = Modifier.height(64.dp))
             }
         }
     }

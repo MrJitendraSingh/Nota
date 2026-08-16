@@ -1,3 +1,9 @@
+buildscript {
+    dependencies {
+        classpath(libs.commons.lang3)
+    }
+}
+
 plugins {
     // this is necessary to avoid the plugins to be loaded multiple times
     // in each subproject's classloader
