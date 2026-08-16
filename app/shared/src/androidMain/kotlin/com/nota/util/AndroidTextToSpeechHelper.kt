@@ -93,4 +93,8 @@ class AndroidTextToSpeechHelper(context: Context) : TextToSpeechHelper {
         Log.d("TTS", "Stopping TTS")
         tts?.stop()
     }
+
+    override fun setRate(rate: Float) {
+        tts?.setSpeechRate(rate)
+    }
 }

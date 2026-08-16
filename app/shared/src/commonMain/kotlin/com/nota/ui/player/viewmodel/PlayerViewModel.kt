@@ -109,8 +109,20 @@ class PlayerViewModel(
                         playNote(noteText)
                         
                         val bpm = note?.tempo?.takeIf { it > 0 } ?: 120
+                        
+                        // Dynamically adjust TTS rate based on tempo
+                        // 120 BPM -> 1.0f rate, 240 BPM -> 2.0f rate, etc.
+                        val ttsRate = (bpm.toFloat() / 120f).coerceIn(0.5f, 3.0f)
+                        ttsHelper?.setRate(ttsRate)
+
                         val delayTime = (60000 / bpm).toLong()
                         delay(delayTime)
+                    }
+
+                    // Breath time pause between measures
+                    val breathTime = note?.breathTime ?: 0
+                    if (breathTime > 0) {
+                        delay(breathTime * 1000L)
                     }
                 }
 

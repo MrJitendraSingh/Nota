@@ -7,7 +7,7 @@ import io.ktor.client.call.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.serialization.kotlinx.json.*
-import kotlinx.datetime.Clock
+import kotlin.time.Clock
 import kotlinx.serialization.json.*
 
 class DataSyncService(
@@ -57,7 +57,7 @@ class DataSyncService(
         return lines.drop(1).filter { it.isNotBlank() }.mapNotNull { line ->
             try {
                 val values = csvSplit(line)
-                val now = try { Clock.System.now().toEpochMilliseconds() } catch(e: Throwable) { 0L }
+                val now = Clock.System.now().toEpochMilliseconds()
                 
                 val measuresString = values.getOrNull(8) ?: ""
                 val parsedMeasures = parseMeasures(measuresString)

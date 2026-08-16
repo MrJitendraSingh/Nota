@@ -8,6 +8,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,16 +20,28 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nota.ui.add.viewmodel.AddViewModel
 import com.nota.ui.add.viewmodel.AddUiState
+import com.nota.ui.common.ConfirmationDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddScreen(viewModel: AddViewModel, onBackClick: () -> Unit) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(uiState.isSaved) {
         if (uiState.isSaved) {
             onBackClick()
         }
+    }
+
+    if (showDeleteDialog) {
+        ConfirmationDialog(
+            title = "Delete Notation",
+            message = "Are you sure you want to delete this notation? This action cannot be undone.",
+            confirmButtonText = "Delete",
+            onConfirm = { viewModel.deleteNote() },
+            onDismiss = { showDeleteDialog = false }
+        )
     }
 
     Scaffold(
@@ -38,6 +51,17 @@ fun AddScreen(viewModel: AddViewModel, onBackClick: () -> Unit) {
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                },
+                actions = {
+                    if (uiState.isEditMode) {
+                        IconButton(onClick = { showDeleteDialog = true }) {
+                            Icon(
+                                Icons.Default.Delete,
+                                contentDescription = "Delete",
+                                tint = MaterialTheme.colorScheme.error
+                            )
+                        }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -127,7 +151,7 @@ fun AddContent(
                     OutlinedTextField(
                         value = uiState.breathTime,
                         onValueChange = onBreathTimeChange,
-                        label = { Text("Breath Time") },
+                        label = { Text("Breath Time (sec)") },
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(12.dp)
                     )

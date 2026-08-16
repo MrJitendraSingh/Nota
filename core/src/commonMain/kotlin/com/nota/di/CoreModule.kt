@@ -10,6 +10,7 @@ import com.nota.domain.usecase.GetNoteUseCase
 import com.nota.domain.usecase.GetNotesUseCase
 import com.nota.domain.usecase.InsertNoteUseCase
 import com.nota.domain.usecase.ToggleFavoriteUseCase
+import com.nota.domain.usecase.DeleteNoteUseCase
 
 class CoreModule(driverFactory: DriverFactory) {
     val noteRepository: NoteRepository by lazy {
@@ -41,6 +42,11 @@ class CoreModule(driverFactory: DriverFactory) {
     val toggleFavoriteUseCase: ToggleFavoriteUseCase by lazy {
         println("CoreModule: Initializing toggleFavoriteUseCase")
         ToggleFavoriteUseCase(noteRepository)
+    }
+
+    val deleteNoteUseCase: DeleteNoteUseCase by lazy {
+        println("CoreModule: Initializing deleteNoteUseCase")
+        DeleteNoteUseCase(noteRepository)
     }
 
     val dataSyncService: DataSyncService by lazy {

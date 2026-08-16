@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.nota.domain.Note
 import com.nota.domain.usecase.InsertNoteUseCase
 import com.nota.domain.usecase.GetNoteUseCase
+import com.nota.domain.usecase.DeleteNoteUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -29,7 +30,8 @@ data class AddUiState(
 class AddViewModel(
     private val noteId: String? = null,
     private val insertNoteUseCase: InsertNoteUseCase,
-    private val getNoteUseCase: GetNoteUseCase
+    private val getNoteUseCase: GetNoteUseCase,
+    private val deleteNoteUseCase: DeleteNoteUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AddUiState(id = noteId, isEditMode = noteId != null))
@@ -102,6 +104,18 @@ class AddViewModel(
                 _uiState.value = state.copy(isSaved = true)
             } catch (e: Exception) {
                 _uiState.value = state.copy(errorMessage = "Failed to save: ${e.message}")
+            }
+        }
+    }
+
+    fun deleteNote() {
+        val id = _uiState.value.id ?: return
+        viewModelScope.launch {
+            try {
+                deleteNoteUseCase(id)
+                _uiState.value = _uiState.value.copy(isSaved = true)
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(errorMessage = "Failed to delete: ${e.message}")
             }
         }
     }

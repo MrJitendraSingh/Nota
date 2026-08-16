@@ -10,6 +10,7 @@ import platform.darwin.NSObject
 class IosTextToSpeechHelper : TextToSpeechHelper {
     private val synthesizer = AVSpeechSynthesizer()
     private var onCompleteCallback: (() -> Unit)? = null
+    private var rate: Float = 0.5f
 
     private val delegate = object : NSObject(), AVSpeechSynthesizerDelegateProtocol {
         override fun speechSynthesizer(synthesizer: AVSpeechSynthesizer, didFinishSpeechUtterance: AVSpeechUtterance) {
@@ -30,12 +31,16 @@ class IosTextToSpeechHelper : TextToSpeechHelper {
         onCompleteCallback = onComplete
         val utterance = AVSpeechUtterance.speechUtteranceWithString(text)
         utterance.voice = AVSpeechSynthesisVoice.voiceWithLanguage("en-US")
-        utterance.rate = 0.5f 
+        utterance.rate = rate 
         
         synthesizer.speakUtterance(utterance)
     }
 
     override fun stop() {
         synthesizer.stopSpeakingAtBoundary(AVSpeechBoundary.AVSpeechBoundaryImmediate)
+    }
+
+    override fun setRate(rate: Float) {
+        this.rate = rate
     }
 }

@@ -94,7 +94,8 @@ fun App(
                             AddViewModel(
                                 noteId = selectedNote?.id,
                                 insertNoteUseCase = coreModule.insertNoteUseCase,
-                                getNoteUseCase = coreModule.getNoteUseCase
+                                getNoteUseCase = coreModule.getNoteUseCase,
+                                deleteNoteUseCase = coreModule.deleteNoteUseCase
                             )
                         }
                         AddScreen(
