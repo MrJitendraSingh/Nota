@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nota.domain.Note
 import com.nota.domain.usecase.GetNoteUseCase
+import com.nota.domain.usecase.GetNotesUseCase
 import com.nota.ui.common.NoteUiModel
 import com.nota.ui.common.toUiModel
 import com.nota.util.TextToSpeechHelper
@@ -24,8 +25,9 @@ data class PlayerUiState(
 )
 
 class PlayerViewModel(
-    private val noteId: String,
+    private var noteId: String,
     private val getNoteUseCase: GetNoteUseCase,
+    private val getNotesUseCase: GetNotesUseCase,
     private val ttsHelper: TextToSpeechHelper? = null
 ) : ViewModel() {
 
@@ -34,17 +36,32 @@ class PlayerViewModel(
 
     private var note: Note? = null
     private var playbackJob: Job? = null
+    private var allNoteIds: List<String> = emptyList()
+    private var noteLoadingJob: Job? = null
 
     init {
+        loadAllNotes()
         loadNote()
     }
 
-    private fun loadNote() {
+    private fun loadAllNotes() {
         viewModelScope.launch {
+            getNotesUseCase().collect { notes ->
+                allNoteIds = notes.map { it.id }
+            }
+        }
+    }
+
+    private fun loadNote() {
+        noteLoadingJob?.cancel()
+        noteLoadingJob = viewModelScope.launch {
             getNoteUseCase(noteId).collect { fetchedNote ->
                 note = fetchedNote
                 _uiState.value = _uiState.value.copy(
-                    currentNote = fetchedNote?.toUiModel()
+                    currentNote = fetchedNote?.toUiModel(),
+                    currentMeasureIndex = 0,
+                    currentNoteIndex = 0,
+                    progress = 0f
                 )
             }
         }
@@ -65,6 +82,11 @@ class PlayerViewModel(
         _uiState.value = _uiState.value.copy(isPlaying = true)
 
         playbackJob = viewModelScope.launch {
+            // Wait for note to be loaded if it's currently loading
+            while (note == null && noteLoadingJob?.isActive == true) {
+                delay(50)
+            }
+            
             val measures = note?.measures ?: return@launch
             
             while (true) {
@@ -97,7 +119,6 @@ class PlayerViewModel(
                         currentMeasureIndex = 0,
                         currentNoteIndex = 0
                     )
-                    // Continue loop
                 } else {
                     _uiState.value = _uiState.value.copy(
                         isPlaying = false,
@@ -124,11 +145,8 @@ class PlayerViewModel(
     }
 
     private fun sanitizeNoteText(text: String): String {
-        // Map common notation symbols to speakable words if needed
-        // For example, if 'text' is "C4", TTS might say "C four". 
-        // If it's a special symbol like "-", it might be silence.
         return when (text) {
-            "-" -> "" // Silence
+            "-" -> "" 
             else -> text
         }
     }
@@ -161,31 +179,28 @@ class PlayerViewModel(
     }
 
     fun playNext() {
-        // Simple skip to next measure
-        pausePlayback()
-        val measures = note?.measures ?: return
-        var nextM = _uiState.value.currentMeasureIndex + 1
-        if (nextM >= measures.size) nextM = 0
+        if (allNoteIds.isEmpty()) return
         
-        _uiState.value = _uiState.value.copy(
-            currentMeasureIndex = nextM,
-            currentNoteIndex = 0,
-            progress = calculateProgress(nextM, 0, measures)
-        )
+        pausePlayback()
+        val currentIndex = allNoteIds.indexOf(noteId)
+        val nextIndex = if (currentIndex < allNoteIds.size - 1) currentIndex + 1 else 0
+        
+        noteId = allNoteIds[nextIndex]
+        note = null // Clear current note to trigger loading wait
+        loadNote()
         startPlayback()
     }
 
     fun playPrevious() {
-        pausePlayback()
-        val measures = note?.measures ?: return
-        var prevM = _uiState.value.currentMeasureIndex - 1
-        if (prevM < 0) prevM = measures.size - 1
+        if (allNoteIds.isEmpty()) return
         
-        _uiState.value = _uiState.value.copy(
-            currentMeasureIndex = prevM,
-            currentNoteIndex = 0,
-            progress = calculateProgress(prevM, 0, measures)
-        )
+        pausePlayback()
+        val currentIndex = allNoteIds.indexOf(noteId)
+        val prevIndex = if (currentIndex > 0) currentIndex - 1 else allNoteIds.size - 1
+        
+        noteId = allNoteIds[prevIndex]
+        note = null // Clear current note to trigger loading wait
+        loadNote()
         startPlayback()
     }
 

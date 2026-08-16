@@ -63,6 +63,7 @@ fun App(
                             PlayerViewModel(
                                 noteId = selectedNote?.id ?: "",
                                 getNoteUseCase = coreModule.getNoteUseCase,
+                                getNotesUseCase = coreModule.getNotesUseCase,
                                 ttsHelper = ttsHelper
                             )
                         }
