@@ -181,9 +181,17 @@ fun HomeContent(
                 }
             }
 
-            if (uiState.isLoading) {
+            if (uiState.isLoading || (uiState.notes.isEmpty() && uiState.isSyncing)) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
+                }
+            } else if (filteredItems.isEmpty()) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text(
+                        "No data found",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
             } else {
                 LazyVerticalGrid(

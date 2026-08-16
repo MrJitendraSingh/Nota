@@ -38,7 +38,8 @@ fun App(
     val homeViewModel = remember(coreModule) {
         HomeViewModel(
             getNotesUseCase = coreModule.getNotesUseCase,
-            toggleFavoriteUseCase = coreModule.toggleFavoriteUseCase
+            toggleFavoriteUseCase = coreModule.toggleFavoriteUseCase,
+            dataSyncService = coreModule.dataSyncService
         )
     }
     
@@ -47,7 +48,7 @@ fun App(
     }
 
     NotaTheme {
-        var currentScreen by remember { mutableStateOf("landing") }
+        var currentScreen by remember { mutableStateOf("home") }
         var selectedNote by remember { mutableStateOf<NoteUiModel?>(null) }
 
         Surface(

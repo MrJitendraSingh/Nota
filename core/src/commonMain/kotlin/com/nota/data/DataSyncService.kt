@@ -8,6 +8,9 @@ import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlin.time.Clock
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.serialization.json.*
 
 class DataSyncService(
@@ -20,11 +23,15 @@ class DataSyncService(
         }
     }
 ) {
+    private val _isSyncing = MutableStateFlow(true)
+    val isSyncing: StateFlow<Boolean> = _isSyncing.asStateFlow()
+
     // CSV export URL for the Google Sheet
     private val sheetUrl = "https://docs.google.com/spreadsheets/d/1fXvvQT9iKnX-tc5SNH2YkbPjkGssydYRRJeB0IoLOxo/export?format=csv"
 
     suspend fun syncData() {
         println("Starting sync from Google Sheet...")
+        _isSyncing.value = true
         try {
             val response: String = httpClient.get(sheetUrl).body()
             val notes = parseCsv(response)
@@ -36,6 +43,8 @@ class DataSyncService(
         } catch (e: Throwable) {
             println("Sync failed: ${e.message}")
             e.printStackTrace()
+        } finally {
+            _isSyncing.value = false
         }
     }
 
