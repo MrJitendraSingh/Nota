@@ -35,7 +35,7 @@ kotlin {
     }
 
     android {
-       namespace = "com.nota.app.shared"
+       namespace = "com.mj.nota.app.shared"
        compileSdk = libs.versions.android.compileSdk.get().toInt()
        minSdk = libs.versions.android.minSdk.get().toInt()
     
@@ -90,6 +90,7 @@ kotlin {
 
 compose.resources {
     publicResClass = true
+    packageOfResClass = "com.mj.nota.app.shared"
 }
 
 dependencies {

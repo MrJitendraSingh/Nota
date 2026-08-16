@@ -18,11 +18,11 @@ dependencies {
 
 compose.desktop {
     application {
-        mainClass = "com.nota.MainKt"
+        mainClass = "com.mj.nota.MainKt"
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "com.nota"
+            packageName = "com.mj.nota"
             packageVersion = "1.0.0"
 
             linux {

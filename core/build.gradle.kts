@@ -33,7 +33,7 @@ kotlin {
     }
     
     android {
-       namespace = "com.nota.core"
+       namespace = "com.mj.nota.core"
        compileSdk = libs.versions.android.compileSdk.get().toInt()
        minSdk = libs.versions.android.minSdk.get().toInt()
     
@@ -85,7 +85,7 @@ kotlin {
 sqldelight {
     databases {
         create("NotaDatabase") {
-            packageName.set("com.nota.db")
+            packageName.set("com.mj.nota.db")
         }
     }
 }
