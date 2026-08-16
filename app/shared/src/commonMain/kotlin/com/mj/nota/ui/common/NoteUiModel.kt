@@ -6,5 +6,6 @@ data class NoteUiModel(
     val date: String,
     val isFavorite: Boolean,
     val tempo: Int = 80,
-    val breathTime: Int = 2
+    val breathTime: Int = 2,
+    val measures: List<List<String>> = emptyList()
 )
