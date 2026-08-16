@@ -34,7 +34,7 @@ fun AddScreen(viewModel: AddViewModel, onBackClick: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Create Notation", fontWeight = FontWeight.Bold) },
+                title = { Text(if (uiState.isEditMode) "Edit Notation" else "Create Notation", fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -210,7 +210,7 @@ fun AddContent(
             modifier = Modifier.fillMaxWidth().height(56.dp),
             shape = RoundedCornerShape(16.dp)
         ) {
-            Text("Save to Library", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Text(if (uiState.isEditMode) "Update Notation" else "Save to Library", fontSize = 18.sp, fontWeight = FontWeight.Bold)
         }
         
         Spacer(modifier = Modifier.height(20.dp))

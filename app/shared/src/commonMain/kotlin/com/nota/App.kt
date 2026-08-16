@@ -62,7 +62,14 @@ fun App(
                             selectedNote = note
                             currentScreen = "player"
                         },
-                        onAddClick = { currentScreen = "add" }
+                        onAddClick = { 
+                            selectedNote = null
+                            currentScreen = "add" 
+                        },
+                        onEditClick = { note ->
+                            selectedNote = note
+                            currentScreen = "add"
+                        }
                     )
                     "player" -> {
                         val playerViewModel = remember(selectedNote) {
@@ -79,8 +86,12 @@ fun App(
                         )
                     }
                     "add" -> {
-                        val addViewModel = remember(coreModule) {
-                            AddViewModel(coreModule.insertNoteUseCase)
+                        val addViewModel = remember(selectedNote, coreModule) {
+                            AddViewModel(
+                                noteId = selectedNote?.id,
+                                insertNoteUseCase = coreModule.insertNoteUseCase,
+                                getNoteUseCase = coreModule.getNoteUseCase
+                            )
                         }
                         AddScreen(
                             viewModel = addViewModel,

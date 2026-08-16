@@ -20,6 +20,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Card
@@ -62,7 +63,8 @@ import org.jetbrains.compose.resources.painterResource
 fun HomeScreen(
     viewModel: HomeViewModel,
     onNoteClick: (NoteUiModel) -> Unit,
-    onAddClick: () -> Unit
+    onAddClick: () -> Unit,
+    onEditClick: (NoteUiModel) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     
@@ -72,7 +74,8 @@ fun HomeScreen(
         onNoteClick = onNoteClick,
         onFavoriteClick = { note ->
             viewModel.toggleFavorite(note.id, note.isFavorite)
-        }
+        },
+        onEditClick = onEditClick
     )
 }
 
@@ -82,7 +85,8 @@ fun HomeContent(
     uiState: HomeUiState,
     onAddClick: () -> Unit,
     onNoteClick: (NoteUiModel) -> Unit,
-    onFavoriteClick: (NoteUiModel) -> Unit
+    onFavoriteClick: (NoteUiModel) -> Unit,
+    onEditClick: (NoteUiModel) -> Unit
 ) {
     var selectedTab by remember { mutableStateOf(0) }
     val tabs = listOf("All", "Favourite", "Created")
@@ -180,7 +184,8 @@ fun HomeContent(
                         NotationCard(
                             item = item,
                             onClick = { onNoteClick(item) },
-                            onFavoriteClick = { onFavoriteClick(item) }
+                            onFavoriteClick = { onFavoriteClick(item) },
+                            onEditClick = { onEditClick(item) }
                         )
                     }
                 }
@@ -193,7 +198,8 @@ fun HomeContent(
 fun NotationCard(
     item: NoteUiModel,
     onClick: () -> Unit,
-    onFavoriteClick: () -> Unit
+    onFavoriteClick: () -> Unit,
+    onEditClick: () -> Unit
 ) {
     Card(
         onClick = onClick,
@@ -225,16 +231,38 @@ fun NotationCard(
                     }
                 }
                 
-                IconButton(
-                    onClick = onFavoriteClick,
-                    modifier = Modifier.align(Alignment.TopEnd).padding(4.dp)
+                Row(
+                    modifier = Modifier.align(Alignment.TopEnd).padding(4.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        imageVector = if (item.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                        contentDescription = if (item.isFavorite) "Unfavorite" else "Favorite",
-                        tint = if (item.isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
-                        modifier = Modifier.size(20.dp)
-                    )
+                    if (item.id.startsWith("note_")) {
+                        IconButton(
+                            onClick = onEditClick,
+                            modifier = Modifier
+                                .size(32.dp)
+                                .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.7f), RoundedCornerShape(8.dp))
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = "Edit",
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(4.dp))
+                    }
+
+                    IconButton(
+                        onClick = onFavoriteClick,
+                        modifier = Modifier.size(32.dp)
+                    ) {
+                        Icon(
+                            imageVector = if (item.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                            contentDescription = if (item.isFavorite) "Unfavorite" else "Favorite",
+                            tint = if (item.isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
                 }
             }
             

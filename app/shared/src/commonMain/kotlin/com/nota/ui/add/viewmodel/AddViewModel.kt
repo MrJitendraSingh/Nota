@@ -4,13 +4,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nota.domain.Note
 import com.nota.domain.usecase.InsertNoteUseCase
+import com.nota.domain.usecase.GetNoteUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlin.time.Clock
 
 data class AddUiState(
+    val id: String? = null,
     val title: String = "",
     val instrument: String = "",
     val scale: String = "",
@@ -19,15 +22,38 @@ data class AddUiState(
     val currentNotesInput: String = "",
     val measures: List<List<String>> = emptyList(),
     val isSaved: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val isEditMode: Boolean = false
 )
 
 class AddViewModel(
-    private val insertNoteUseCase: InsertNoteUseCase
+    private val noteId: String? = null,
+    private val insertNoteUseCase: InsertNoteUseCase,
+    private val getNoteUseCase: GetNoteUseCase
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(AddUiState())
+    private val _uiState = MutableStateFlow(AddUiState(id = noteId, isEditMode = noteId != null))
     val uiState: StateFlow<AddUiState> = _uiState.asStateFlow()
+
+    init {
+        noteId?.let { loadNote(it) }
+    }
+
+    private fun loadNote(id: String) {
+        viewModelScope.launch {
+            val note = getNoteUseCase(id).firstOrNull()
+            note?.let {
+                _uiState.value = _uiState.value.copy(
+                    title = it.title,
+                    instrument = it.instrument,
+                    scale = it.scale,
+                    tempo = it.tempo.toString(),
+                    breathTime = it.breathTime.toString(),
+                    measures = it.measures
+                )
+            }
+        }
+    }
 
     fun onTitleChange(value: String) { _uiState.value = _uiState.value.copy(title = value) }
     fun onInstrumentChange(value: String) { _uiState.value = _uiState.value.copy(instrument = value) }
@@ -61,7 +87,7 @@ class AddViewModel(
             try {
                 val now = Clock.System.now().toEpochMilliseconds()
                 val note = Note(
-                    id = "note_${now}",
+                    id = state.id ?: "note_${now}",
                     version = 1,
                     title = state.title,
                     thumbnailUrl = "",
@@ -70,7 +96,7 @@ class AddViewModel(
                     scale = state.scale,
                     instrument = state.instrument,
                     measures = state.measures,
-                    createdAt = now
+                    createdAt = if (state.isEditMode) 0L else now // In a real app we'd preserve createdAt
                 )
                 insertNoteUseCase(note)
                 _uiState.value = state.copy(isSaved = true)
