@@ -23,14 +23,14 @@ dependencies {
 }
 
 android {
-    namespace = "com.nota"
+    namespace = "com.mj.nota"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "com.nota"
+        applicationId = "com.mj.nota"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 1
+        versionCode = 2
         versionName = "1.0"
     }
     packaging {

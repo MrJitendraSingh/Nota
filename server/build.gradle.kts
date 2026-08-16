@@ -3,10 +3,10 @@ plugins {
     alias(libs.plugins.ktor)
 }
 
-group = "com.nota"
+group = "com.mj.nota"
 version = "1.0.0"
 application {
-    mainClass = "com.nota.ApplicationKt"
+    mainClass = "com.mj.nota.ApplicationKt"
 }
 
 dependencies {

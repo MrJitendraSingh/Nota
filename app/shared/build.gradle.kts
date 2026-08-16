@@ -9,6 +9,8 @@ plugins {
 }
 
 kotlin {
+    applyDefaultHierarchyTemplate()
+
     listOf(
         iosArm64(),
         iosSimulatorArm64()
@@ -33,7 +35,7 @@ kotlin {
     }
 
     android {
-       namespace = "com.nota.app.shared"
+       namespace = "com.mj.nota.app.shared"
        compileSdk = libs.versions.android.compileSdk.get().toInt()
        minSdk = libs.versions.android.minSdk.get().toInt()
     
@@ -64,6 +66,7 @@ kotlin {
             implementation(libs.compose.foundation)
             implementation(libs.compose.material3)
             implementation(libs.compose.icons)
+            implementation(libs.compose.icons.extended)
             implementation(libs.compose.ui)
             implementation(libs.compose.components.resources)
             implementation(libs.compose.uiToolingPreview)
@@ -71,6 +74,11 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.kotlinx.datetime)
         }
+        
+        val iosMain by getting {
+            dependsOn(commonMain.get())
+        }
+
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
@@ -82,6 +90,7 @@ kotlin {
 
 compose.resources {
     publicResClass = true
+    packageOfResClass = "com.mj.nota.app.shared"
 }
 
 dependencies {

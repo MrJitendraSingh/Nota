@@ -1,0 +1,35 @@
+import kotlin.Boolean;
+import kotlin.Int;
+import kotlin.String;
+import kotlin.collections.List;
+import kotlin.Long;
+
+CREATE TABLE NoteEntity (
+    id TEXT PRIMARY KEY,
+    version INTEGER AS Int NOT NULL,
+    title TEXT NOT NULL,
+    thumbnailUrl TEXT NOT NULL,
+    tempo INTEGER AS Int NOT NULL,
+    breathTime INTEGER AS Int NOT NULL,
+    scale TEXT NOT NULL,
+    instrument TEXT NOT NULL,
+    measures TEXT AS List<List<String>> NOT NULL,
+    createdAt INTEGER NOT NULL,
+    isFavorite INTEGER AS Boolean NOT NULL DEFAULT 0
+);
+
+selectAllNotes:
+SELECT * FROM NoteEntity;
+
+selectNoteById:
+SELECT * FROM NoteEntity WHERE id = ?;
+
+insertNote:
+INSERT OR REPLACE INTO NoteEntity(id, version, title, thumbnailUrl, tempo, breathTime, scale, instrument, measures, createdAt, isFavorite)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+deleteNote:
+DELETE FROM NoteEntity WHERE id = ?;
+
+updateFavorite:
+UPDATE NoteEntity SET isFavorite = ? WHERE id = ?;
