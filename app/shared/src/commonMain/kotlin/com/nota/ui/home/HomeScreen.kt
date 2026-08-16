@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -64,7 +65,8 @@ fun HomeScreen(
     viewModel: HomeViewModel,
     onNoteClick: (NoteUiModel) -> Unit,
     onAddClick: () -> Unit,
-    onEditClick: (NoteUiModel) -> Unit
+    onEditClick: (NoteUiModel) -> Unit,
+    onSettingClick: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     
@@ -75,7 +77,8 @@ fun HomeScreen(
         onFavoriteClick = { note ->
             viewModel.toggleFavorite(note.id, note.isFavorite)
         },
-        onEditClick = onEditClick
+        onEditClick = onEditClick,
+        onSettingClick = onSettingClick
     )
 }
 
@@ -86,7 +89,8 @@ fun HomeContent(
     onAddClick: () -> Unit,
     onNoteClick: (NoteUiModel) -> Unit,
     onFavoriteClick: (NoteUiModel) -> Unit,
-    onEditClick: (NoteUiModel) -> Unit
+    onEditClick: (NoteUiModel) -> Unit,
+    onSettingClick: () -> Unit
 ) {
     var selectedTab by remember { mutableStateOf(0) }
     val tabs = listOf("All", "Favourite", "Created")
@@ -119,7 +123,16 @@ fun HomeContent(
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background
-                )
+                ),
+                actions = {
+                    IconButton(onClick = onSettingClick) {
+                        Icon(
+                            Icons.Default.Settings,
+                            contentDescription = "Settings",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
             )
         },
         floatingActionButton = {

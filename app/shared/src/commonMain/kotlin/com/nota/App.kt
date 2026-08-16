@@ -18,6 +18,7 @@ import com.nota.ui.player.PlayerScreen
 import com.nota.ui.player.viewmodel.PlayerViewModel
 import com.nota.ui.add.AddScreen
 import com.nota.ui.add.viewmodel.AddViewModel
+import com.nota.ui.setting.SettingScreen
 import com.nota.util.TextToSpeechHelper
 import com.nota.di.CoreModule
 import com.nota.di.LocalCoreModule
@@ -69,6 +70,9 @@ fun App(
                         onEditClick = { note ->
                             selectedNote = note
                             currentScreen = "add"
+                        },
+                        onSettingClick = {
+                            currentScreen = "settings"
                         }
                     )
                     "player" -> {
@@ -95,6 +99,11 @@ fun App(
                         }
                         AddScreen(
                             viewModel = addViewModel,
+                            onBackClick = { currentScreen = "home" }
+                        )
+                    }
+                    "settings" -> {
+                        SettingScreen(
                             onBackClick = { currentScreen = "home" }
                         )
                     }
