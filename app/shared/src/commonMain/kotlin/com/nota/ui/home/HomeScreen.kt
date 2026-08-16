@@ -59,13 +59,14 @@ import org.jetbrains.compose.resources.painterResource
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
-    onNoteClick: (NoteUiModel) -> Unit
+    onNoteClick: (NoteUiModel) -> Unit,
+    onAddClick: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     
     HomeContent(
         uiState = uiState,
-        onAddClick = { /* Handle Add */ },
+        onAddClick = onAddClick,
         onNoteClick = onNoteClick
     )
 }

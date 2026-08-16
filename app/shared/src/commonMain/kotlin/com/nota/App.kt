@@ -16,6 +16,8 @@ import com.nota.ui.common.NoteUiModel
 import com.nota.ui.landing.LandingScreen
 import com.nota.ui.player.PlayerScreen
 import com.nota.ui.player.viewmodel.PlayerViewModel
+import com.nota.ui.add.AddScreen
+import com.nota.ui.add.viewmodel.AddViewModel
 import com.nota.util.TextToSpeechHelper
 import com.nota.di.CoreModule
 import com.nota.di.LocalCoreModule
@@ -56,7 +58,8 @@ fun App(
                         onNoteClick = { note ->
                             selectedNote = note
                             currentScreen = "player"
-                        }
+                        },
+                        onAddClick = { currentScreen = "add" }
                     )
                     "player" -> {
                         val playerViewModel = remember(selectedNote) {
@@ -69,6 +72,15 @@ fun App(
                         }
                         PlayerScreen(
                             viewModel = playerViewModel,
+                            onBackClick = { currentScreen = "home" }
+                        )
+                    }
+                    "add" -> {
+                        val addViewModel = remember(coreModule) {
+                            AddViewModel(coreModule.insertNoteUseCase)
+                        }
+                        AddScreen(
+                            viewModel = addViewModel,
                             onBackClick = { currentScreen = "home" }
                         )
                     }

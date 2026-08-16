@@ -8,6 +8,7 @@ import com.nota.db.createDatabase
 import com.nota.domain.NoteRepository
 import com.nota.domain.usecase.GetNoteUseCase
 import com.nota.domain.usecase.GetNotesUseCase
+import com.nota.domain.usecase.InsertNoteUseCase
 
 class CoreModule(driverFactory: DriverFactory) {
     val noteRepository: NoteRepository by lazy {
@@ -29,6 +30,11 @@ class CoreModule(driverFactory: DriverFactory) {
     val getNoteUseCase: GetNoteUseCase by lazy {
         println("CoreModule: Initializing getNoteUseCase")
         GetNoteUseCase(noteRepository)
+    }
+
+    val insertNoteUseCase: InsertNoteUseCase by lazy {
+        println("CoreModule: Initializing insertNoteUseCase")
+        InsertNoteUseCase(noteRepository)
     }
 
     val dataSyncService: DataSyncService by lazy {
