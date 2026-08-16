@@ -7,4 +7,5 @@ interface NoteRepository {
     fun getNoteById(id: String): Flow<Note?>
     suspend fun insertNote(note: Note)
     suspend fun deleteNote(id: String)
+    suspend fun updateFavorite(id: String, isFavorite: Boolean)
 }

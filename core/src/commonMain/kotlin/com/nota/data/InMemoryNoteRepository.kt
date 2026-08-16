@@ -24,4 +24,9 @@ class InMemoryNoteRepository : NoteRepository {
     override suspend fun deleteNote(id: String) {
         notesFlow.value = notesFlow.value - id
     }
+
+    override suspend fun updateFavorite(id: String, isFavorite: Boolean) {
+        val note = notesFlow.value[id] ?: return
+        notesFlow.value = notesFlow.value + (id to note.copy(isFavorite = isFavorite))
+    }
 }

@@ -35,7 +35,10 @@ fun App(
     }
     
     val homeViewModel = remember(coreModule) {
-        HomeViewModel(coreModule.getNotesUseCase)
+        HomeViewModel(
+            getNotesUseCase = coreModule.getNotesUseCase,
+            toggleFavoriteUseCase = coreModule.toggleFavoriteUseCase
+        )
     }
     
     LaunchedEffect(coreModule) {

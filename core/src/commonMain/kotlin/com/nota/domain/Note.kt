@@ -14,5 +14,6 @@ data class Note(
     val scale: String,
     val instrument: String,
     val measures: List<List<String>>,
-    val createdAt: Long = 0L // Keep for internal tracking, though not in the user's JSON example
+    val createdAt: Long = 0L, // Keep for internal tracking, though not in the user's JSON example
+    val isFavorite: Boolean = false
 )

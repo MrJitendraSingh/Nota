@@ -10,7 +10,7 @@ fun Note.toUiModel(): NoteUiModel {
         id = id,
         title = title,
         date = formatTimestamp(createdAt),
-        isFavorite = false
+        isFavorite = isFavorite
     )
 }
 

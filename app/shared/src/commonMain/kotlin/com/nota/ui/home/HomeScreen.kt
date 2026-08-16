@@ -21,6 +21,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -28,6 +29,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
@@ -67,7 +69,10 @@ fun HomeScreen(
     HomeContent(
         uiState = uiState,
         onAddClick = onAddClick,
-        onNoteClick = onNoteClick
+        onNoteClick = onNoteClick,
+        onFavoriteClick = { note ->
+            viewModel.toggleFavorite(note.id, note.isFavorite)
+        }
     )
 }
 
@@ -76,12 +81,18 @@ fun HomeScreen(
 fun HomeContent(
     uiState: HomeUiState,
     onAddClick: () -> Unit,
-    onNoteClick: (NoteUiModel) -> Unit
+    onNoteClick: (NoteUiModel) -> Unit,
+    onFavoriteClick: (NoteUiModel) -> Unit
 ) {
     var selectedTab by remember { mutableStateOf(0) }
-    val tabs = listOf("All", "Favourite")
+    val tabs = listOf("All", "Favourite", "Created")
     
-    val filteredItems = if (selectedTab == 0) uiState.notes else uiState.notes.filter { it.isFavorite }
+    val filteredItems = when (selectedTab) {
+        0 -> uiState.notes
+        1 -> uiState.notes.filter { it.isFavorite }
+        2 -> uiState.notes.filter { it.id.startsWith("note_") }
+        else -> uiState.notes
+    }
 
     Scaffold(
         topBar = {
@@ -168,7 +179,8 @@ fun HomeContent(
                     items(filteredItems) { item ->
                         NotationCard(
                             item = item,
-                            onClick = { onNoteClick(item) }
+                            onClick = { onNoteClick(item) },
+                            onFavoriteClick = { onFavoriteClick(item) }
                         )
                     }
                 }
@@ -180,7 +192,8 @@ fun HomeContent(
 @Composable
 fun NotationCard(
     item: NoteUiModel,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onFavoriteClick: () -> Unit
 ) {
     Card(
         onClick = onClick,
@@ -212,12 +225,15 @@ fun NotationCard(
                     }
                 }
                 
-                if (item.isFavorite) {
+                IconButton(
+                    onClick = onFavoriteClick,
+                    modifier = Modifier.align(Alignment.TopEnd).padding(4.dp)
+                ) {
                     Icon(
-                        Icons.Default.Favorite,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.align(Alignment.TopEnd).padding(8.dp).size(16.dp)
+                        imageVector = if (item.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                        contentDescription = if (item.isFavorite) "Unfavorite" else "Favorite",
+                        tint = if (item.isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
+                        modifier = Modifier.size(20.dp)
                     )
                 }
             }

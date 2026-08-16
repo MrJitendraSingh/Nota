@@ -29,7 +29,8 @@ class SqlDelightNoteRepository(database: NotaDatabase) : NoteRepository {
                         scale = entity.scale,
                         instrument = entity.instrument,
                         measures = entity.measures,
-                        createdAt = entity.createdAt
+                        createdAt = entity.createdAt,
+                        isFavorite = entity.isFavorite
                     )
                 }
             }
@@ -51,7 +52,8 @@ class SqlDelightNoteRepository(database: NotaDatabase) : NoteRepository {
                         scale = it.scale,
                         instrument = it.instrument,
                         measures = it.measures,
-                        createdAt = it.createdAt
+                        createdAt = it.createdAt,
+                        isFavorite = it.isFavorite
                     )
                 }
             }
@@ -68,11 +70,16 @@ class SqlDelightNoteRepository(database: NotaDatabase) : NoteRepository {
             scale = note.scale,
             instrument = note.instrument,
             measures = note.measures,
-            createdAt = note.createdAt
+            createdAt = note.createdAt,
+            isFavorite = note.isFavorite
         )
     }
 
     override suspend fun deleteNote(id: String) {
         queries.deleteNote(id)
+    }
+
+    override suspend fun updateFavorite(id: String, isFavorite: Boolean) {
+        queries.updateFavorite(isFavorite, id)
     }
 }

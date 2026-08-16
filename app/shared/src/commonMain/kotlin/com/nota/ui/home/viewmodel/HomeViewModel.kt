@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nota.domain.Note
 import com.nota.domain.usecase.GetNotesUseCase
+import com.nota.domain.usecase.ToggleFavoriteUseCase
 import com.nota.ui.common.NoteUiModel
 import com.nota.ui.common.toUiModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,7 +21,8 @@ data class HomeUiState(
 )
 
 class HomeViewModel(
-    private val getNotesUseCase: GetNotesUseCase
+    private val getNotesUseCase: GetNotesUseCase,
+    private val toggleFavoriteUseCase: ToggleFavoriteUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState(isLoading = true))
@@ -43,6 +45,16 @@ class HomeViewModel(
             } catch (e: Throwable) {
                 println("Error loading notes: ${e.message}")
                 _uiState.value = HomeUiState(isLoading = false)
+            }
+        }
+    }
+
+    fun toggleFavorite(noteId: String, currentFavorite: Boolean) {
+        viewModelScope.launch {
+            try {
+                toggleFavoriteUseCase(noteId, !currentFavorite)
+            } catch (e: Throwable) {
+                println("Error toggling favorite: ${e.message}")
             }
         }
     }
