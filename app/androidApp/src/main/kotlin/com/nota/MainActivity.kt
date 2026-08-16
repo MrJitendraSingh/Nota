@@ -5,8 +5,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.nota.db.DriverFactory
+import com.nota.util.AndroidTextToSpeechHelper
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.tooling.preview.Preview
 
 class MainActivity : ComponentActivity() {
@@ -15,7 +17,12 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            App(DriverFactory(applicationContext))
+            val context = androidx.compose.ui.platform.LocalContext.current
+            val ttsHelper = remember { AndroidTextToSpeechHelper(context) }
+            App(
+                driverFactory = DriverFactory(applicationContext),
+                ttsHelper = ttsHelper
+            )
         }
     }
 }

@@ -49,20 +49,24 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nota.ui.common.NoteUiModel
 import com.nota.ui.home.viewmodel.HomeUiState
 import com.nota.ui.home.viewmodel.HomeViewModel
-import com.nota.ui.home.viewmodel.NoteUiModel
 import nota.app.shared.generated.resources.Res
 import nota.app.shared.generated.resources.app_icon
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
-fun HomeScreen(viewModel: HomeViewModel) {
+fun HomeScreen(
+    viewModel: HomeViewModel,
+    onNoteClick: (NoteUiModel) -> Unit
+) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     
     HomeContent(
         uiState = uiState,
-        onAddClick = { /* Handle Add */ }
+        onAddClick = { /* Handle Add */ },
+        onNoteClick = onNoteClick
     )
 }
 
@@ -70,7 +74,8 @@ fun HomeScreen(viewModel: HomeViewModel) {
 @Composable
 fun HomeContent(
     uiState: HomeUiState,
-    onAddClick: () -> Unit
+    onAddClick: () -> Unit,
+    onNoteClick: (NoteUiModel) -> Unit
 ) {
     var selectedTab by remember { mutableStateOf(0) }
     val tabs = listOf("All", "Favourite")
@@ -160,7 +165,10 @@ fun HomeContent(
                     modifier = Modifier.fillMaxSize()
                 ) {
                     items(filteredItems) { item ->
-                        NotationCard(item)
+                        NotationCard(
+                            item = item,
+                            onClick = { onNoteClick(item) }
+                        )
                     }
                 }
             }
@@ -169,8 +177,12 @@ fun HomeContent(
 }
 
 @Composable
-fun NotationCard(item: NoteUiModel) {
+fun NotationCard(
+    item: NoteUiModel,
+    onClick: () -> Unit
+) {
     Card(
+        onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
             .aspectRatio(0.8f),

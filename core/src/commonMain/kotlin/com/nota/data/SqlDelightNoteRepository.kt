@@ -2,6 +2,7 @@ package com.nota.data
 
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
+import app.cash.sqldelight.coroutines.mapToOneOrNull
 import com.nota.db.NotaDatabase
 import com.nota.domain.Note
 import com.nota.domain.NoteRepository
@@ -29,6 +30,28 @@ class SqlDelightNoteRepository(database: NotaDatabase) : NoteRepository {
                         instrument = entity.instrument,
                         measures = entity.measures,
                         createdAt = entity.createdAt
+                    )
+                }
+            }
+    }
+
+    override fun getNoteById(id: String): Flow<Note?> {
+        return queries.selectNoteById(id)
+            .asFlow()
+            .mapToOneOrNull(Dispatchers.Main)
+            .map { entity ->
+                entity?.let {
+                    Note(
+                        id = it.id,
+                        version = it.version,
+                        title = it.title,
+                        thumbnailUrl = it.thumbnailUrl,
+                        tempo = it.tempo,
+                        breathTime = it.breathTime,
+                        scale = it.scale,
+                        instrument = it.instrument,
+                        measures = it.measures,
+                        createdAt = it.createdAt
                     )
                 }
             }

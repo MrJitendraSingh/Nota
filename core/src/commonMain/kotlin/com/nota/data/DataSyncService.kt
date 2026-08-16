@@ -43,24 +43,85 @@ class DataSyncService(
         val lines = csv.lines()
         if (lines.size <= 1) return emptyList()
 
-        // Assuming columns: id, version, title, thumbnailUrl, tempo, breathTime, scale, instrument, measures
-        // This is a simplified parser. For production, a robust CSV library or JSON export would be better.
+        // Correct Mapping based on Sheet:
+        // 0: ID
+        // 1: Version
+        // 2: Title
+        // 3: Thumbnail URL
+        // 4: Instrument
+        // 5: Tempo
+        // 6: Breath Time
+        // 7: Scale
+        // 8: Measures
         
-        return lines.drop(1).filter { it.isNotBlank() }.map { line ->
-            val values = line.split(",")
-            val now = try { Clock.System.now().toEpochMilliseconds() } catch(e: Throwable) { 0L }
-            Note(
-                id = values.getOrNull(0) ?: "sync_${now}",
-                version = values.getOrNull(1)?.toIntOrNull() ?: 1,
-                title = values.getOrNull(2) ?: "Untitled",
-                thumbnailUrl = values.getOrNull(3) ?: "",
-                tempo = values.getOrNull(4)?.toIntOrNull() ?: 80,
-                breathTime = values.getOrNull(5)?.toIntOrNull() ?: 2,
-                scale = values.getOrNull(6) ?: "C",
-                instrument = values.getOrNull(7) ?: "Piano",
-                measures = listOf(listOf("Sa", "Re", "Ga", "Ma")),
-                createdAt = now
-            )
+        return lines.drop(1).filter { it.isNotBlank() }.mapNotNull { line ->
+            try {
+                val values = csvSplit(line)
+                val now = try { Clock.System.now().toEpochMilliseconds() } catch(e: Throwable) { 0L }
+                
+                val measuresString = values.getOrNull(8) ?: ""
+                val parsedMeasures = parseMeasures(measuresString)
+
+                Note(
+                    id = values.getOrNull(0) ?: "sync_${now}",
+                    version = values.getOrNull(1)?.toIntOrNull() ?: 1,
+                    title = values.getOrNull(2) ?: "Untitled",
+                    thumbnailUrl = values.getOrNull(3) ?: "",
+                    instrument = values.getOrNull(4) ?: "Piano",
+                    tempo = values.getOrNull(5)?.toIntOrNull() ?: 80,
+                    breathTime = values.getOrNull(6)?.toIntOrNull() ?: 2,
+                    scale = values.getOrNull(7) ?: "C",
+                    measures = parsedMeasures,
+                    createdAt = now
+                )
+            } catch (e: Exception) {
+                println("Error parsing line: $line - ${e.message}")
+                null
+            }
         }
+    }
+
+    /**
+     * Splits a CSV line correctly, handling quoted values.
+     */
+    private fun csvSplit(line: String): List<String> {
+        val result = mutableListOf<String>()
+        var current = StringBuilder()
+        var inQuotes = false
+        
+        for (char in line) {
+            when {
+                char == '\"' -> inQuotes = !inQuotes
+                char == ',' && !inQuotes -> {
+                    result.add(current.toString().trim())
+                    current = StringBuilder()
+                }
+                else -> current.append(char)
+            }
+        }
+        result.add(current.toString().trim())
+        return result
+    }
+
+    /**
+     * Parses the measures string into a List<List<String>>.
+     * Example input: "Ni Re Ga Ma' Pa | Dha Ni Sa' | Sa' Ni Dha Pa Ma' Ga | Re Sa"
+     */
+    private fun parseMeasures(measuresStr: String): List<List<String>> {
+        if (measuresStr.isBlank()) return emptyList()
+        
+        // Remove surrounding quotes if they exist (sometimes added by CSV export)
+        val cleanStr = if (measuresStr.startsWith("\"") && measuresStr.endsWith("\"")) {
+            measuresStr.substring(1, measuresStr.length - 1)
+        } else {
+            measuresStr
+        }
+
+        return cleanStr.split("|")
+            .map { measure ->
+                measure.trim().split(Regex("\\s+"))
+                    .filter { it.isNotBlank() }
+            }
+            .filter { it.isNotEmpty() }
     }
 }

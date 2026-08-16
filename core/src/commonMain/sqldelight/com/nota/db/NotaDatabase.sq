@@ -1,6 +1,7 @@
 import kotlin.Int;
 import kotlin.String;
 import kotlin.collections.List;
+import kotlin.Long;
 
 CREATE TABLE NoteEntity (
     id TEXT PRIMARY KEY,
@@ -18,8 +19,11 @@ CREATE TABLE NoteEntity (
 selectAllNotes:
 SELECT * FROM NoteEntity;
 
+selectNoteById:
+SELECT * FROM NoteEntity WHERE id = ?;
+
 insertNote:
-INSERT INTO NoteEntity(id, version, title, thumbnailUrl, tempo, breathTime, scale, instrument, measures, createdAt)
+INSERT OR REPLACE INTO NoteEntity(id, version, title, thumbnailUrl, tempo, breathTime, scale, instrument, measures, createdAt)
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 deleteNote:

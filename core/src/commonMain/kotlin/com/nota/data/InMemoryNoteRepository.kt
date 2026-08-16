@@ -13,6 +13,10 @@ class InMemoryNoteRepository : NoteRepository {
         return notesFlow.map { it.values.toList().sortedByDescending { note -> note.createdAt } }
     }
 
+    override fun getNoteById(id: String): Flow<Note?> {
+        return notesFlow.map { it[id] }
+    }
+
     override suspend fun insertNote(note: Note) {
         notesFlow.value = notesFlow.value + (note.id to note)
     }
