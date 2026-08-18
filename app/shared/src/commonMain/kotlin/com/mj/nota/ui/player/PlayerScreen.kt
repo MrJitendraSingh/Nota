@@ -13,8 +13,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -118,13 +121,49 @@ fun PlayerContent(
             modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Title of Item at the bottom, above the bar
+            // Current line (measure) of nodes with highlight
+            val currentMeasure = uiState.currentNote?.measures?.getOrNull(uiState.currentMeasureIndex) ?: emptyList()
+            if (currentMeasure.isNotEmpty()) {
+                val annotatedString = buildAnnotatedString {
+                    currentMeasure.forEachIndexed { index, node ->
+                        if (index == uiState.currentNoteIndex) {
+                            withStyle(style = SpanStyle(
+                                color = MaterialTheme.colorScheme.primary,
+                                fontWeight = FontWeight.Bold
+                            )) {
+                                append(node)
+                            }
+                        } else {
+                            withStyle(style = SpanStyle(
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                            )) {
+                                append(node)
+                            }
+                        }
+                        if (index < currentMeasure.size - 1) {
+                            append("  ")
+                        }
+                    }
+                }
+                Text(
+                    text = annotatedString,
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        letterSpacing = 2.sp,
+                        fontWeight = FontWeight.Medium
+                    ),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(bottom = 12.dp)
+                )
+            }
+
+            // Title of Item at the bottom, aligned to Start
             Text(
                 text = uiState.currentNote?.title ?: "No Note Selected",
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(bottom = 16.dp)
+                textAlign = TextAlign.Start,
+                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
             )
 
             // Progress Slider
